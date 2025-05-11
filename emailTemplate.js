@@ -1,10 +1,9 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
-const puppeteer = require('puppeteer-core');
+const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
-const PDFDocument = require('pdfkit');
 
 // Ensure environment variables are set
 if (!process.env.KLAVIYO_PRIVATE_API_KEY || !process.env.KLAVIYO_PUBLIC_API_KEY || !process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
@@ -271,7 +270,6 @@ const senderWaterReport = async (data, Name, email, code, res) => {
         //generate pdf with puppeteer
         try {
         const browser = await puppeteer.launch({
-            executablePath: '/usr/bin/google-chrome-stable',
             headless: true,
            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
@@ -288,7 +286,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
             attachments: [
                 {
                     filename: 'Water_Report.pdf',
-                    content: htmlContent,
+                    content: pdfBuffer,
                     contentType: 'application/pdf'
                 },
             ]

@@ -269,7 +269,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
 
         //generate pdf with puppeteer
         const browser = await puppeteer.launch({
-            headless: false,
+            headless: 'new',
         });
         const page = await browser.newPage();
         await page.setContent(pdfHtmlContent);

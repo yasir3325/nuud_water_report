@@ -15,6 +15,7 @@ app.use(express.json());
 
 const fetchWaterReport = async (zipcode) => {
     try {
+        alert('zip_code: ' +zipcode);
         const fetchReport = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`);
         const data = await fetchReport.json();
         const checkAcid = ['Haloacetic', 'Bromochloroacetic', 'trihalomethanes', 'Dichloroacetic', 'Trichloroacetic', 'Bromodichloromethane', 'Arsenic', 'Cadmium', 'Chromium (hexavalent)', 'Mercury (inorganic)', 'Nitrate and nitrite', '1,4-Dioxane', 'Uranium'];
@@ -38,6 +39,7 @@ app.post('/send-email', async (req, res) => {
 
     const resData = await fetchWaterReport(zipcode);
     if (resData) {
+        alert('resData: ')
         await senderWaterReport(resData, name, email, zipcode, res);
     } else {
         res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Something is Wrong with this zip code please recheck!' });

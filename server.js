@@ -66,7 +66,6 @@ app.post('/send-email', async (req, res) => {
     alert('zip_code: ');
     const resData = await fetchWaterReport(zipcode);
     if (resData) {
-        alert('resData: ')
         await senderWaterReport(resData, name, email, zipcode, res);
     } else {
         res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Something is Wrong with this zip code please recheck!' });

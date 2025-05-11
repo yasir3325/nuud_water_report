@@ -269,14 +269,14 @@ const senderWaterReport = async (data, Name, email, code, res) => {
 
         //generate pdf with puppeteer
         try {
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
-        const page = await browser.newPage();
-        await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
-        await browser.close();
+       // const browser = await puppeteer.launch({
+         //   headless: true,
+         //   args: ['--no-sandbox', '--disable-setuid-sandbox']
+       // });
+        //const page = await browser.newPage();
+        //await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
+        //const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
+        //await browser.close();
 
         let mailOptions = {
             from: process.env.SMTP_USER,
@@ -286,7 +286,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
             attachments: [
                 {
                     filename: 'Water_Report.pdf',
-                    content: pdfBuffer,
+                    content: htmlContent,
                     contentType: 'application/pdf'
                 },
             ]

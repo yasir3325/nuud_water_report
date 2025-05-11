@@ -31,6 +31,7 @@ const fetchWaterReport = async (zipcode) => {
 }
 
 // Route to handle form submission and send email
+// testing
 app.post('/send-email', async (req, res) => {
     const { name, email, zipcode } = req.body;
 

@@ -1,6 +1,7 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const path = require('path');
+const fetch = require('node-fetch');
 const { senderWaterReport } = require('./emailTemplate');
 
 dotenv.config();

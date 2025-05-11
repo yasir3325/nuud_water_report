@@ -12,7 +12,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());
-
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const fetchWaterReport = async (zipcode) => {
     try {
         alert('zip_code: ' +zipcode);
@@ -36,7 +36,7 @@ const fetchWaterReport = async (zipcode) => {
 // testing
 app.post('/send-email', async (req, res) => {
     const { name, email, zipcode } = req.body;
-
+    alert('zip_code: ');
     const resData = await fetchWaterReport(zipcode);
     if (resData) {
         alert('resData: ')

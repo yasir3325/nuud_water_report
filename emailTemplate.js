@@ -276,14 +276,9 @@ const senderWaterReport = async (data, Name, email, code, res) => {
        // });
         //const page = await browser.newPage();
         //await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
-        const { chromium } = require('playwright');
-
-const browser = await chromium.launch();
-const page = await browser.newPage();
-await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle' });
-const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
-await browser.close();
-//await browser.close();
+        const file = { content: pdfHtmlContent };
+        const pdfBuffer = await pdf.generatePdf(file, { format: 'A4', printBackground: true, landscape: true, });
+        //await browser.close();
 
         let mailOptions = {
             from: process.env.SMTP_USER,

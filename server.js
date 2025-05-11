@@ -12,37 +12,51 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(express.json());
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
 const fetchWaterReport = async (zipcode) => {
     try {
         const response = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`);
 
-        // Check if the response is OK
+        console.log(`Status: ${response.status}`);
+
+        const contentType = response.headers.get('content-type');
+        console.log(`Content-Type: ${contentType}`);
+
+        const text = await response.text();
+        console.log('Raw response text (first 500 chars):\n', text.slice(0, 500));
+
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
 
-        const text = await response.text();
-
-        // Try parsing the response as JSON
         let data;
         try {
             data = JSON.parse(text);
-        } catch (jsonError) {
-            throw new Error("Response is not valid JSON: " + text.slice(0, 100));
+        } catch (err) {
+            throw new Error("JSON parsing failed. Response was:\n" + text.slice(0, 500));
         }
 
-        const checkAcid = ['Haloacetic', 'Bromochloroacetic', 'trihalomethanes', 'Dichloroacetic', 'Trichloroacetic', 'Bromodichloromethane', 'Arsenic', 'Cadmium', 'Chromium (hexavalent)', 'Mercury (inorganic)', 'Nitrate and nitrite', '1,4-Dioxane', 'Uranium'];
+        if (!data.ContaminantList) {
+            throw new Error("ContaminantList not found in response.");
+        }
 
-        const matchedData = data.ContaminantList?.filter(item =>
+        const checkAcid = [
+            'Haloacetic', 'Bromochloroacetic', 'trihalomethanes', 'Dichloroacetic', 'Trichloroacetic',
+            'Bromodichloromethane', 'Arsenic', 'Cadmium', 'Chromium (hexavalent)', 'Mercury (inorganic)',
+            'Nitrate and nitrite', '1,4-Dioxane', 'Uranium'
+        ];
+
+        const matchedData = data.ContaminantList.filter(item =>
             checkAcid.some(acid => item.ContaminantName.includes(acid))
-        ) || [];
+        );
 
         return matchedData;
     } catch (error) {
         console.error('Error fetching water report:', error.message);
         return null;
     }
-}
+};
+
 
 
 // Route to handle form submission and send email

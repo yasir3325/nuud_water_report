@@ -63,12 +63,23 @@ const fetchWaterReport = async (zipcode) => {
 // testing
 app.post('/send-email', async (req, res) => {
     const { name, email, zipcode } = req.body;
-    alert('zip_code: ');
+
     const resData = await fetchWaterReport(zipcode);
+
     if (resData) {
-        await senderWaterReport(resData, name, email, zipcode, res);
+        try {
+            await senderWaterReport(resData, name, email, zipcode, res);
+
+            // If senderWaterReport doesn't end the response, send a success JSON
+            if (!res.headersSent) {
+                res.status(200).json({ message: 'Email sent successfully' });
+            }
+        } catch (err) {
+            console.error('Email sending error:', err);
+            res.status(500).json({ error: 'Failed to send email' });
+        }
     } else {
-        res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Something is Wrong with this zip code please recheck!' });
+        res.status(400).json({ error: 'Invalid zip code or failed to fetch data' });
     }
 });
 

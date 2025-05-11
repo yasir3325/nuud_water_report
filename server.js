@@ -15,36 +15,22 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 
 const fetchWaterReport = async (zipcode) => {
     try {
-        const response = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`);
-
-        console.log(`Status: ${response.status}`);
-
-        const contentType = response.headers.get('content-type');
-        console.log(`Content-Type: ${contentType}`);
+        const response = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/90.0.4430.212 Safari/537.36',
+                'Accept': 'application/json'
+            }
+        });
 
         const text = await response.text();
-        console.log('Raw response text (first 500 chars):\n', text.slice(0, 500));
 
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
 
-        let data;
-        try {
-            data = JSON.parse(text);
-        } catch (err) {
-            throw new Error("JSON parsing failed. Response was:\n" + text.slice(0, 500));
-        }
+        const data = JSON.parse(text);
 
-        if (!data.ContaminantList) {
-            throw new Error("ContaminantList not found in response.");
-        }
-
-        const checkAcid = [
-            'Haloacetic', 'Bromochloroacetic', 'trihalomethanes', 'Dichloroacetic', 'Trichloroacetic',
-            'Bromodichloromethane', 'Arsenic', 'Cadmium', 'Chromium (hexavalent)', 'Mercury (inorganic)',
-            'Nitrate and nitrite', '1,4-Dioxane', 'Uranium'
-        ];
+        const checkAcid = [/* your list */];
 
         const matchedData = data.ContaminantList.filter(item =>
             checkAcid.some(acid => item.ContaminantName.includes(acid))
@@ -56,6 +42,7 @@ const fetchWaterReport = async (zipcode) => {
         return null;
     }
 };
+
 
 
 

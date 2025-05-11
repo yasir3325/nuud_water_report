@@ -271,16 +271,13 @@ const senderWaterReport = async (data, Name, email, code, res) => {
         try {
         const browser = await puppeteer.launch({
             headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         const page = await browser.newPage();
         await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
         const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
         await browser.close();
-    } catch (err) {
-        console.error('Puppeteer Error:', err);
-        throw err;
-    }
+
         let mailOptions = {
             from: process.env.SMTP_USER,
             to: email,
@@ -306,6 +303,10 @@ const senderWaterReport = async (data, Name, email, code, res) => {
 
             return res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Check Your Email To See The Water Report!' });
         });
+    } catch (err) {
+        console.error('Puppeteer Error:', err);
+        throw err;
+    }
     } catch (error) {
         console.log(error.message);
         return res.status(500).setHeader('Content-Type', 'application/json').json({ message: 'Error in email Serve' });

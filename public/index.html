@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water report</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script type="text/javascript" src="https://cdn.emailjs.com/sdk/3.2.0/email.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="heading">
+            <h1>SEE WHAT CHEMICALS ARE IN YOUR WATER
+                <p>Enter your information below to get a free, custom water report for your local area.</p>
+        </div>
+        <div class="form-box">
+            <div class="form-container">
+                <h2>LEARN ABOUT WHAT'S IN YOUR WATER: </h2>
+                <form id="myForm" action="/send-email" method="POST">
+                    <input type="text" name="name" placeholder="Name" required>
+                    <input type="email" name="email" placeholder="Email" required>
+                    <input type="number" name="zipcode" placeholder="Zip Code" required>
+                    <p>Your privacy is our biggest concern. Your information stays
+                        confidential, and
+                        will
+                        never be shared,
+                        sold, or used unlawfully.
+                    </p>
+                    <!-- Message box to show response -->
+                    <p id="responseMessage" class="responseMessage"></p>
+                    <!-- Loader -->
+                    <div class="loader" id="loader"></div>
+
+                    <button type="submit">GET MY FREE WATER REPORT</button>
+                </form>
+            </div>
+            <div class="image-container">
+                <img src="https://jolieskinco.com/cdn/shop/files/phone-image_800x.png?v=1629402321" alt="report">
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("myForm");
+        const responseMessage = document.getElementById("responseMessage");
+        const loader = document.getElementById("loader");
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Show the loader
+            loader.style.display = "block";
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData);
+
+            fetch('/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide the loader
+                    loader.style.display = "none";
+                    // Show success message on the frontend
+                    responseMessage.textContent = data.message;
+                    setTimeout(() => {
+                        responseMessage.textContent = '';
+                    }, 8000);  // 8000 milliseconds = 8 seconds
+                })
+                .catch(error => {
+                    // Hide the loader
+                    loader.style.display = "none";
+                    // Show error message on the frontend
+                    responseMessage.textContent = error.message;
+                    // Remove the message after 8 seconds
+                    setTimeout(() => {
+                        responseMessage.textContent = '';
+                    }, 8000);
+                });
+        });
+    </script>
+    <script>
+    </script>
+</body>
+
+</html>

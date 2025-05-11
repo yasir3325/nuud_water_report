@@ -1,7 +1,8 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
-const puppeteer = require('puppeteer');
+//const puppeteer = require('puppeteer-core');
+const pdf = require('html-pdf-node');
 const path = require('path');
 const fs = require('fs');
 
@@ -269,14 +270,15 @@ const senderWaterReport = async (data, Name, email, code, res) => {
 
         //generate pdf with puppeteer
         try {
-        const browser = await puppeteer.launch({
-            headless: true,
-           args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
-        const page = await browser.newPage();
-        await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
-        const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
-        await browser.close();
+       //const browser = await puppeteer.launch({
+        //    headless: true,
+       //    args: ['--no-sandbox', '--disable-setuid-sandbox']
+       // });
+        //const page = await browser.newPage();
+        //await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
+        const file = { content: pdfHtmlContent };
+        const pdfBuffer = await pdf.generatePdf(file, { format: 'A4', printBackground: true, landscape: true, });
+        //await browser.close();
 
         let mailOptions = {
             from: process.env.SMTP_USER,

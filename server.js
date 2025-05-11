@@ -14,15 +14,28 @@ app.use(express.json());
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const fetchWaterReport = async (zipcode) => {
     try {
-        alert('zip_code: ' +zipcode);
-        const fetchReport = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`);
-        const data = await fetchReport.json();
+        const response = await fetch(`https://waterapi.ewg.org/zip_contaminant.php?zip=${zipcode}&key=abf422a7-a33f-856d-a1f1-bfa2d9b9a658`);
+
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const text = await response.text();
+
+        // Try parsing the response as JSON
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (jsonError) {
+            throw new Error("Response is not valid JSON: " + text.slice(0, 100));
+        }
+
         const checkAcid = ['Haloacetic', 'Bromochloroacetic', 'trihalomethanes', 'Dichloroacetic', 'Trichloroacetic', 'Bromodichloromethane', 'Arsenic', 'Cadmium', 'Chromium (hexavalent)', 'Mercury (inorganic)', 'Nitrate and nitrite', '1,4-Dioxane', 'Uranium'];
 
-        // Filter contaminants that match any of the acids in the checkAcid array
-        const matchedData = data.ContaminantList.filter(item =>
+        const matchedData = data.ContaminantList?.filter(item =>
             checkAcid.some(acid => item.ContaminantName.includes(acid))
-        );
+        ) || [];
 
         return matchedData;
     } catch (error) {
@@ -30,6 +43,7 @@ const fetchWaterReport = async (zipcode) => {
         return null;
     }
 }
+
 
 // Route to handle form submission and send email
 // testing

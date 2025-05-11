@@ -58,7 +58,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
 
         // Email sending
         // Nodemailer transporter
-        alert("entered")
+        alert("entered");
         const transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
             port: process.env.SMTP_PORT,
@@ -68,7 +68,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
                 pass: process.env.SMTP_PASS
             }
         });
-alert(transporter.host)
+alert(transporter.host);
         // HTML email content with placeholders for dynamic data
         let htmlContent = `
         <!DOCTYPE html>

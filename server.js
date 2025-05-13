@@ -59,14 +59,14 @@ app.post('/send-email', async (req, res) => {
 
             // If senderWaterReport doesn't end the response, send a success JSON
             if (!res.headersSent) {
-                res.status(200).json({ message: 'Email sent successfully' });
+                return res.status(200).json({ message: 'Email sent successfully' });
             }
         } catch (err) {
             console.error('Email sending error:', err);
-            res.status(500).json({ error: 'Failed to send email' });
+            return res.status(500).json({ error: 'Failed to send email' });
         }
     } else {
-        res.status(400).json({ error: 'Invalid zip code or failed to fetch data' });
+        return res.status(400).json({ error: 'Invalid zip code or failed to fetch data' });
     }
 });
 

@@ -1,8 +1,7 @@
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 dotenv.config();
-//const puppeteer = require('puppeteer-core');
-const pdf = require('html-pdf-node');
+const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 
@@ -269,17 +268,14 @@ const senderWaterReport = async (data, Name, email, code, res) => {
         let pdfHtmlContent = htmlContent;
 
         //generate pdf with puppeteer
-        try {
-       //const browser = await puppeteer.launch({
-        //    headless: true,
-       //    args: ['--no-sandbox', '--disable-setuid-sandbox']
-       // });
+       
+       const browser = await puppeteer.launch({
+            headless: false,
+        });
         //const page = await browser.newPage();
         //await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
-        const file = { content: pdfHtmlContent };
-        const pdfBuffer = await pdf.generatePdf(file, { format: 'A4', printBackground: true, landscape: true, });
+        //const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
         //await browser.close();
-
         let mailOptions = {
             from: process.env.SMTP_USER,
             to: email,
@@ -288,30 +284,27 @@ const senderWaterReport = async (data, Name, email, code, res) => {
             attachments: [
                 {
                     filename: 'Water_Report.pdf',
-                    content: pdfBuffer,
+                    content: htmlContent,
                     contentType: 'application/pdf'
                 },
             ]
         };
 
 
-        transporter.sendMail(mailOptions, async (error, info) => {
+        await transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
-                return res.status(500).setHeader('Content-Type', 'application/json').json({ message: 'Email not sent!' });
+                return res.status(500).json({ message: 'Email not sent!' });
             }
 
             // Track the email event in Klaviyo
             await trackEmailEvent(email, Name, code);
 
-            return res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Check Your Email To See The Water Report!' });
+            return res.status(200).json({ message: 'Check Your Email To See The Water Report!' });
         });
-    } catch (err) {
-        console.error('Puppeteer Error:', err);
-        throw err;
-    }
+    
     } catch (error) {
         console.log(error.message);
-        return res.status(500).setHeader('Content-Type', 'application/json').json({ message: 'Error in email Serve' });
+        return res.status(500).json({ message: 'Error in email Serve' });
     }
 }
 

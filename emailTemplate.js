@@ -67,6 +67,7 @@ const senderWaterReport = async (data, Name, email, code, res) => {
                 pass: process.env.SMTP_PASS
             }
         });
+
         // HTML email content with placeholders for dynamic data
         let htmlContent = `
         <!DOCTYPE html>
@@ -268,14 +269,14 @@ const senderWaterReport = async (data, Name, email, code, res) => {
         let pdfHtmlContent = htmlContent;
 
         //generate pdf with puppeteer
-       
-       const browser = await puppeteer.launch({
+        const browser = await puppeteer.launch({
             headless: false,
         });
         //const page = await browser.newPage();
-        //await page.setContent(pdfHtmlContent, { waitUntil: 'networkidle0' });
+        //await page.setContent(pdfHtmlContent);
         //const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true, landscape: true, });
         //await browser.close();
+
         let mailOptions = {
             from: process.env.SMTP_USER,
             to: email,
@@ -291,20 +292,19 @@ const senderWaterReport = async (data, Name, email, code, res) => {
         };
 
 
-        await transporter.sendMail(mailOptions, async (error, info) => {
+        transporter.sendMail(mailOptions, async (error, info) => {
             if (error) {
-                return res.status(500).json({ message: 'Email not sent!' });
+                return res.status(500).setHeader('Content-Type', 'application/json').json({ message: 'Email not sent!' });
             }
 
             // Track the email event in Klaviyo
             await trackEmailEvent(email, Name, code);
 
-            return res.status(200).json({ message: 'Check Your Email To See The Water Report!' });
+            return res.status(200).setHeader('Content-Type', 'application/json').json({ message: 'Check Your Email To See The Water Report!' });
         });
-    
     } catch (error) {
         console.log(error.message);
-        return res.status(500).json({ message: 'Error in email Serve' });
+        return res.status(500).setHeader('Content-Type', 'application/json').json({ message: 'Error in email Serve' });
     }
 }
 
